@@ -2,12 +2,20 @@ from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from foodgram.settings import min_time, min_amount
 from users.models import User
 
 def validation_time_cooking(value):
-    if value < 1:
+    if value < min_time:
         raise ValidationError(
-            'Время приготовления не меньше 1 минуты'
+            f'Время приготовления не меньше {min_time} минуты'
+        )
+    return value
+
+def validation_amount(value):
+    if value < min_amount:
+        raise ValidationError(
+            f'Как минимум {min_amount} ингредиент'
         )
     return value
 
@@ -39,7 +47,7 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Теги'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления, минуты',
         validators=[validation_time_cooking],
     )
@@ -92,7 +100,10 @@ class IngredientsAmount(models.Model):
         related_name='ingredients',
         verbose_name='Ингрединты',
     )
-    amount = models.PositiveIntegerField(verbose_name='Количество')
+    amount = models.PositiveSmallIntegerField(
+        verbose_name='Количество',
+        validators=[validation_amount],
+    )
 
     def __str__(self):
         return f'{self.name} - {self.amount}'
@@ -111,6 +122,11 @@ class FavoriteRecipe(models.Model):
         verbose_name='Рецепт',
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe',), name='unique_favorite')]
+
     def __str__(self):
         return f'{self.user} - {self.recipe}'
 
@@ -127,6 +143,10 @@ class ShoppingCart(models.Model):
         related_name='recipe_cart',
         verbose_name='Рецепт',
     )
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe',), name='unique_shopping_cart')]
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'

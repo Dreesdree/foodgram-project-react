@@ -13,11 +13,11 @@ class User(AbstractUser):
         'Никнайм',
         max_length=150,
         unique=True,
-        validators=[
+        validators=(
             RegexValidator(
                 regex=r'^[\w.@+-]+\Z',
             ),
-        ]
+        )
     )
 
     first_name = models.CharField(

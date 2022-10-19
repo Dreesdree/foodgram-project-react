@@ -18,6 +18,10 @@ class AdminForUser(UserAdmin):
     def has_delete_permission(self, request, obj=None):
         return True
 
+class FollowerAdmin(Admin):
+    list_display = ('user', 'author')
+    list_filter = ('user',)
+
 
 admin.site.register(User, AdminForUser)
-admin.site.register(Follower, Admin)
+admin.site.register(Follower, FollowerAdmin)

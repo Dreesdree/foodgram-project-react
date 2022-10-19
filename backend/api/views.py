@@ -9,11 +9,11 @@ from recipes.models import (
     ShoppingCart, FavoriteRecipe, Ingredient, Recipe, Tag
 )
 from users.models import Follower, User
-from .filters import ResipesFilter
-from .functions import create_list_of_ingredients
-from .mixins import CreateDestroyViewSet, ListRetrieveCreateViewSet
-from .pagination import CustomPagination
-from .permissions import AuthorOrGetOrReadOnly
+from api.filters import ResipesFilter
+from api.functions import create_list_of_ingredients
+from api.mixins import CreateDestroyViewSet, ListRetrieveCreateViewSet
+from api.pagination import CustomPagination
+from api.permissions import AuthorOrGetOrReadOnly
 from api.serializers import (
     FollowerSerializer, IngredientSerializer, ListRetrieveUserSerializer,
     RecipeListRetrieveSerializer, RecipePostToCartSerializer,
@@ -150,7 +150,9 @@ class ShoppingCartViewSet(CreateDestroyViewSet):
         recipe_id = kwargs.get('recipe_id')
         user = request.user
         recipe = Recipe.objects.get(id=recipe_id)
-        ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
+        cart = ShoppingCart.objects.filter(user=user, recipe=recipe)
+        if cart.exists():
+            return cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -170,7 +172,9 @@ class FavoriteViewSet(CreateDestroyViewSet):
         recipe_id = kwargs.get('recipe_id')
         user = request.user
         recipe = Recipe.objects.get(id=recipe_id)
-        FavoriteRecipe.objects.filter(user=user, recipe=recipe).delete()
+        f_recipe = FavoriteRecipe.objects.filter(user=user, recipe=recipe)
+        if f_recipe.exists():
+            return f_recipe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
