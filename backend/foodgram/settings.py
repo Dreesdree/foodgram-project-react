@@ -27,7 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -166,7 +166,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_URLS_REGEX = r'^/api/.*$'
 
-min_time = 1
+MIN_TIME = 1
 
-min_amount = 1
+MIN_AMOUNT = 1
+
+FILENAME = 'list_of_ingredients.txt'
 

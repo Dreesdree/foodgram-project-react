@@ -8,17 +8,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from recipes.models import (
-    ShoppingCart, FavoriteRecipe, Ingredient, IngredientsAmount, Recipe, Tag,
+    ShoppingCart, FavoriteRecipe, Ingredient, IngredientsAmount,
+    Recipe, Tag, validation_amount
 )
 from users.models import Follower, User
-from foodgram.settings import min_time, min_amount
+from foodgram.settings import MIN_TIME
 
-def validation_amount(value):
-    if value < min_amount:
-        raise ValidationError(
-            f'Как минимум {min_amount} ингредиент'
-        )
-    return value
 
 
 class Base64ImageField(serializers.ImageField):
@@ -212,14 +207,14 @@ class RecipePostUpdateSerializer(serializers.ModelSerializer):
         read_only=False,
         many=True,
         required=True,
-        validators=[UniqueValidator(
+        validators=(UniqueValidator(
             queryset=Ingredient.objects.all(),
             message='Нельзя использовать одинаковые ингредиенты',
-            )
-        ]
+            ),
+        ),
     )
     amount = serializers.IntegerField(
-        validators=[validation_amount]
+        validators=(validation_amount,),
     )
     image = Base64ImageField(required=True)
     name = serializers.CharField(required=True)
@@ -243,12 +238,12 @@ class RecipePostUpdateSerializer(serializers.ModelSerializer):
             'author',
             'amount',
         )
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=Recipe.objects.all(),
                 fields=('name', 'author')
             )
-        ]
+        )
 
     @transaction.atomic
     def create(self, validated_data):
@@ -290,9 +285,9 @@ class RecipePostUpdateSerializer(serializers.ModelSerializer):
         return recipe
 
     def validate_cooking_time(self, value):
-        if value < min_time:
+        if value < MIN_TIME:
             raise serializers.ValidationError(
-                f'Время приготовления должно быть как минимум {min_time} минута'
+                f'Время приготовления должно быть как минимум {MIN_TIME} минута'
             )
         return value
 

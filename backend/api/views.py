@@ -20,6 +20,9 @@ from api.serializers import (
     RecipePostUpdateSerializer, TagSerializer, UserPasswordResetSerializer,
     UserSignUpSerializer,
 )
+from foodgram.settings import FILENAME
+
+CONTENT = 'text/plain; charset=UTF-8'
 
 
 class UserViewSet(ListRetrieveCreateViewSet):
@@ -124,13 +127,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user_id = request.user.id
         list_of_ingredients = create_list_of_ingredients(user_id=user_id)
 
-        filename = 'list_of_ingredients.txt'
+        filename = FILENAME
         response = HttpResponse(
             list_of_ingredients,
-            content_type='text/plain; charset=UTF-8',
+            content_type=CONTENT,
         )
         response['Content-Disposition'] = (
-            'attachment; filename={0}'.format(filename)
+            f'attachment; {filename}'
         )
         return response
 
@@ -200,5 +203,7 @@ class FollowerViewSet(CreateDestroyViewSet):
         user_id = kwargs.get('user_id')
         user = request.user
         author = User.objects.get(id=user_id)
-        Follower.objects.filter(user=user, author=author).delete()
+        follower = Follower.objects.filter(user=user, author=author)
+        if follower.exists():
+            return follower.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

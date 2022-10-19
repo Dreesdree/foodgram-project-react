@@ -35,10 +35,22 @@ class TagAdmin(Admin):
     list_display = ('name',)
     list_filter = ('name', 'color', 'slug')
 
+class ShoppingCartAdmin(Admin):
+    list_display = ('user', 'recipe')
+    search_fields = ('user',)
+
+class IngredientAmountAdmin(Admin):
+    list_display = ('name', 'amount')
+    list_filter = ('name',)
+
+class FavoriteRecipeAdmin(Admin):
+    list_display = ('user', 'recipe')
+    list_filter = ('user', 'recipe')
+
 
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag, TagAdmin)
-admin.site.register(IngredientsAmount, Admin)
-admin.site.register(FavoriteRecipe, Admin)
-admin.site.register(ShoppingCart, Admin)
+admin.site.register(IngredientsAmount, IngredientAmountAdmin)
+admin.site.register(FavoriteRecipe, FavoriteRecipeAdmin)
+admin.site.register(ShoppingCart, ShoppingCartAdmin)

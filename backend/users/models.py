@@ -1,6 +1,17 @@
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+
+
+RGEX = r'^[\w.@+-]+\Z'
+
+def validation_color(value):
+    if value != RGEX:
+        raise ValidationError(
+            f'Не соответсвует колор-коду'
+        )
+    return value
+
 
 class User(AbstractUser):
     email = models.EmailField(
@@ -13,11 +24,7 @@ class User(AbstractUser):
         'Никнайм',
         max_length=150,
         unique=True,
-        validators=(
-            RegexValidator(
-                regex=r'^[\w.@+-]+\Z',
-            ),
-        )
+        validators=(validation_color,),
     )
 
     first_name = models.CharField(

@@ -2,20 +2,20 @@ from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from foodgram.settings import min_time, min_amount
+from foodgram.settings import MIN_TIME, MIN_AMOUNT
 from users.models import User
 
 def validation_time_cooking(value):
-    if value < min_time:
+    if value < MIN_TIME:
         raise ValidationError(
-            f'Время приготовления не меньше {min_time} минуты'
+            f'Время приготовления не меньше {MIN_TIME} минуты'
         )
     return value
 
 def validation_amount(value):
-    if value < min_amount:
+    if value < MIN_AMOUNT:
         raise ValidationError(
-            f'Как минимум {min_amount} ингредиент'
+            f'Как минимум {MIN_AMOUNT} ингредиент'
         )
     return value
 
@@ -49,7 +49,7 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления, минуты',
-        validators=[validation_time_cooking],
+        validators=(validation_time_cooking,),
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -57,7 +57,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.name
@@ -102,7 +102,7 @@ class IngredientsAmount(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
-        validators=[validation_amount],
+        validators=(validation_amount,),
     )
 
     def __str__(self):
@@ -144,9 +144,9 @@ class ShoppingCart(models.Model):
         verbose_name='Рецепт',
     )
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe',), name='unique_shopping_cart')]
+                fields=('user', 'recipe',), name='unique_shopping_cart')),
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'
