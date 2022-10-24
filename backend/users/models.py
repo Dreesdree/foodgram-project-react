@@ -1,16 +1,7 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import models
 
-
-RGEX = r'^[\w.@+-]+\Z'
-
-def validation_color(value):
-    if value != RGEX:
-        raise ValidationError(
-            f'Не соответсвует колор-коду'
-        )
-    return value
 
 
 class User(AbstractUser):
@@ -19,19 +10,20 @@ class User(AbstractUser):
         max_length=254,
         unique=True,
     )
-
     username = models.CharField(
         'Никнайм',
         max_length=150,
         unique=True,
-        validators=(validation_color,),
+        validators=(
+            RegexValidator(
+                regex=r'^[\w.@+-]+\Z',
+            ),
+        )
     )
-
     first_name = models.CharField(
         'Фамилия',
         max_length=150,
     )
-
     last_name = models.CharField(
         'Имя',
         max_length=150,

@@ -3,8 +3,8 @@ import base64
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from recipes.models import (
@@ -138,6 +138,14 @@ class IngredientAmountCreateUpdateSerializer(serializers.ModelSerializer):
         source='name',
         queryset=Ingredient.objects.all(),
     )
+    name = serializers.SlugRelatedField(
+        slug_field='name',
+        read_only=True,
+    )
+    measurement_unit = serializers.CharField(
+        source='name.measurement_unit',
+        read_only=True,
+    )
 
     class Meta:
         model = IngredientsAmount
@@ -213,9 +221,6 @@ class RecipePostUpdateSerializer(serializers.ModelSerializer):
             ),
         ),
     )
-    amount = serializers.IntegerField(
-        validators=(validation_amount,),
-    )
     image = Base64ImageField(required=True)
     name = serializers.CharField(required=True)
     text = serializers.CharField(required=True)
@@ -236,7 +241,6 @@ class RecipePostUpdateSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
             'author',
-            'amount',
         )
         validators = (
             UniqueTogetherValidator(
@@ -252,17 +256,14 @@ class RecipePostUpdateSerializer(serializers.ModelSerializer):
         author = self.context['request'].user
         validated_data['author'] = author
         recipe = Recipe.objects.create(**validated_data)
-
         for tag in tags:
-            recipe.tags.add(tag)
-
+            recipe.tags.set(tag)
         for ingredient in ingredients:
-            ingredient_amount = IngredientsAmount.objects.create(
-                name=ingredient['name'],
+            ingredient_amount = IngredientsAmount.objects.get_or_create(
+                ingredient=ingredient['id'],
                 amount=ingredient['amount'],
             )
-            ingredient_amount_id = ingredient_amount.id
-            recipe.ingredients.add(ingredient_amount_id)
+            recipe.ingredients.add(ingredient_amount)
         return recipe
 
     @transaction.atomic

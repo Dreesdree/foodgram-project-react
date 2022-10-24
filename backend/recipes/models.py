@@ -1,5 +1,6 @@
 from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import models
 
 from foodgram.settings import MIN_TIME, MIN_AMOUNT
@@ -64,12 +65,19 @@ class Recipe(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(
+        unique=True,
         max_length=200,
         verbose_name='Тег',
     )
     color = ColorField(
+        unique=True,
         max_length=7,
         verbose_name='Цветовой код',
+        validators=(
+            RegexValidator(
+                regex=r'^#[\w]{1,8}$',
+            ),
+        ),
     )
     slug = models.SlugField(
         unique=True,
@@ -97,8 +105,13 @@ class IngredientsAmount(models.Model):
     name = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredients',
+        related_name='ingredient_amount',
         verbose_name='Ингрединты',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='ingredients_amounts',
     )
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
@@ -112,20 +125,20 @@ class FavoriteRecipe(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorite',
+        related_name='added_to_favorite',
         verbose_name='Подписчик',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorite',
+        related_name='added_to_favorite',
         verbose_name='Рецепт',
     )
 
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe',), name='unique_favorite')]
+                fields=('user', 'recipe',), name='unique_favorite'),)
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'
@@ -134,13 +147,13 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_cart',
+        related_name='user_added_to_cart',
         verbose_name='Покупатель',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe_cart',
+        related_name='recipe_added_to_cart',
         verbose_name='Рецепт',
     )
     class Meta:
