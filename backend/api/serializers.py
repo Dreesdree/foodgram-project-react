@@ -5,7 +5,7 @@ from rest_framework import serializers
 from foodgram.settings import COUNT_ING
 from users.models import User, FollowAuthor
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount,
-                     Cart, Recipe, Tag)
+                            Cart, Recipe, Tag)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,14 +69,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         if request is None or request.user.is_anonymous:
             return False
         return FavoriteRecipe.objects.filter(user=request.user,
-                                        recipe=obj).exists()
+                                             recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
         return Cart.objects.filter(user=request.user,
-                                       recipe=obj).exists()
+                                   recipe=obj).exists()
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')

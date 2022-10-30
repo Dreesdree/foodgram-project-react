@@ -14,9 +14,9 @@ from recipes.models import (Recipe, Tag, Ingredient, IngredientAmount,
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsOwnerOrAdminOrReadOnly
 from api.serializers import (FavoritesSerializer, FollowerSerializer,
-                          FollowSerializer, IngredientSerializer,
-                          CartSerializer, RecipeSerializer, TagSerializer,
-                          UserSerializer)
+                             FollowSerializer, IngredientSerializer,
+                             CartSerializer, RecipeSerializer, TagSerializer,
+                             UserSerializer)
 
 
 class UserView(UserViewSet):
@@ -203,7 +203,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     }
                 else:
                     list[name]['amount'] = (
-                        list[name]['amount'] + amount
+                            list[name]['amount'] + amount
                     )
 
         shopping_list = []
@@ -214,5 +214,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = 'attachment; filename="shoplist.txt"'
 
         return response
-
-
