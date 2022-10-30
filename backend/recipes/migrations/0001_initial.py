@@ -7,6 +7,7 @@ import recipes.models
 
 
 class Migration(migrations.Migration):
+
     initial = True
 
     dependencies = [
@@ -18,85 +19,39 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(
                     auto_created=True,
-                    primary_key=True,
-                    serialize=False,
-                    verbose_name='ID')
-                 ),
+                    primary_key=True, serialize=False, verbose_name='ID')),
             ],
         ),
         migrations.CreateModel(
             name='FavoriteRecipe',
             fields=[
-                (
-                    'id',
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name='ID'
-                    )
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
             ],
         ),
         migrations.CreateModel(
             name='Ingredient',
             fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')
-                 ),
-                ('name', models.CharField(
-                    max_length=200,
-                    verbose_name='Название ингредиента')
-                 ),
-                ('measurement_unit', models.CharField(
-                    max_length=200,
-                    verbose_name='Единица измерения')
-                 ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=200, verbose_name='Название ингредиента')),
+                ('measurement_unit', models.CharField(max_length=200, verbose_name='Единица измерения')),
             ],
         ),
         migrations.CreateModel(
             name='IngredientAmount',
             fields=[
-                ('id', models.AutoField(
-                    auto_created=True,
-                    primary_key=True,
-                    serialize=False,
-                    verbose_name='ID')
-                 ),
-                ('amount',
-                 models.PositiveIntegerField(verbose_name='Количество')
-                 ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('amount', models.PositiveIntegerField(verbose_name='Количество')),
             ],
         ),
         migrations.CreateModel(
             name='Recipe',
             fields=[
-                ('id', models.AutoField(auto_created=True,
-                                        primary_key=True,
-                                        serialize=False,
-                                        verbose_name='ID')
-                 ),
-                ('name', models.CharField(
-                    max_length=200,
-                    verbose_name='Название рецепта')
-                 ),
-                ('image', models.ImageField(
-                    upload_to='recipes/image',
-                    verbose_name='Фото рецепта')
-                 ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=200, verbose_name='Название рецепта')),
+                ('image', models.ImageField(upload_to='recipes/image', verbose_name='Фото рецепта')),
                 ('text', models.TextField(verbose_name='Описание рецепта')),
-                ('cooking_time', models.IntegerField(
-                    validators=[recipes.models.validate_cooking_time],
-                    verbose_name='Время приготовления, мин')
-                 ),
-                ('pub_date', models.DateTimeField(
-                    auto_now_add=True,
-                    verbose_name='Дата составления рецепта')
-                 ),
+                ('cooking_time', models.IntegerField(validators=[recipes.models.validate_cooking_time], verbose_name='Время приготовления, мин')),
+                ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='Дата составления рецепта')),
             ],
             options={
                 'ordering': ('-pub_date',),
@@ -105,31 +60,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.AutoField(
-                    auto_created=True,
-                    primary_key=True,
-                    serialize=False,
-                    verbose_name='ID')
-                 ),
-                ('name', models.CharField(
-                    max_length=200,
-                    verbose_name='Название тэга')
-                 ),
-                ('color', colorfield.fields.ColorField(
-                    default='#FFFFFF',
-                    image_field=None,
-                    max_length=7,
-                    samples=None,
-                    verbose_name='Цветовой код')
-                 ),
-                ('slug', models.SlugField(
-                    max_length=200,
-                    unique=True,
-                    validators=[
-                        django.core.validators.RegexValidator('^[\\w.@+-]+')
-                    ],
-                    verbose_name='Слаг тэга')
-                 ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=200, verbose_name='Название тэга')),
+                ('color', colorfield.fields.ColorField(default='#FFFFFF', image_field=None, max_length=7, samples=None, verbose_name='Цветовой код')),
+                ('slug', models.SlugField(max_length=200, unique=True, validators=[django.core.validators.RegexValidator('^[\\w.@+-]+')], verbose_name='Слаг тэга')),
             ],
         ),
     ]
