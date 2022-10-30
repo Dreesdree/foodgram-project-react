@@ -3,59 +3,51 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
-from foodgram.settings import MIN_TIME, MIN_AMOUNT
 from users.models import User
+from foodgram.settings import MIN_TIME
 
-def validation_time_cooking(value):
+
+def validate_cooking_time(value):
     if value < MIN_TIME:
         raise ValidationError(
-            f'Время приготовления не меньше {MIN_TIME} минуты'
+            'Время приготовления должно быть не меньше 1 минуты'
         )
     return value
 
-def validation_amount(value):
-    if value < MIN_AMOUNT:
-        raise ValidationError(
-            f'Как минимум {MIN_AMOUNT} ингредиент'
-        )
-    return value
 
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
-        related_name='recipes',
         on_delete=models.CASCADE,
+        related_name='recipes',
         verbose_name='Автор рецепта',
     )
     name = models.CharField(
         max_length=200,
-        verbose_name='Название рецепта'
+        verbose_name='Название рецепта',
     )
     image = models.ImageField(
         upload_to='recipes/image',
         verbose_name='Фото рецепта',
     )
-    text = models.TextField(
-        verbose_name='Описание рецепта'
-    )
+    text = models.TextField(verbose_name='Описание рецепта')
     ingredients = models.ManyToManyField(
-        'IngredientsAmount',
+        'IngredientAmount',
         related_name='recipes',
-        verbose_name='Ингредиенты'
+        verbose_name='Ингредиенты',
     )
     tags = models.ManyToManyField(
         'Tag',
         related_name='recipes',
-        verbose_name='Теги'
+        verbose_name='Тэги'
     )
-    cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления, минуты',
-        validators=(validation_time_cooking,),
+    cooking_time = models.IntegerField(
+        verbose_name='Время приготовления, мин',
+        validators=(validate_cooking_time,),
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата публикации',
-    )
+        verbose_name='Дата составления рецепта',)
 
     class Meta:
         ordering = ('-pub_date',)
@@ -63,35 +55,35 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
+
 class Tag(models.Model):
     name = models.CharField(
-        unique=True,
         max_length=200,
-        verbose_name='Тег',
+        verbose_name='Название тэга',
     )
     color = ColorField(
-        unique=True,
         max_length=7,
         verbose_name='Цветовой код',
-        validators=(
-            RegexValidator(
-                regex=r'^#[\w]{1,8}$',
-            ),
-        ),
     )
     slug = models.SlugField(
         unique=True,
         max_length=200,
-        verbose_name='Слаг тега',
+        verbose_name='Слаг тэга',
+        validators=(
+            RegexValidator(
+                r'^[\w.@+-]+'
+            ),
+        )
     )
 
     def __str__(self):
         return self.name
 
+
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
-        verbose_name='Ингредиент',
+        verbose_name='Название ингредиента',
     )
     measurement_unit = models.CharField(
         max_length=200,
@@ -99,27 +91,37 @@ class Ingredient(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
-class IngredientsAmount(models.Model):
-    name = models.ForeignKey(
+
+class IngredientAmount(models.Model):
+    ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         related_name='ingredient_amount',
-        verbose_name='Ингрединты',
+        verbose_name='Название ингредиента',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='ingredients_amounts',
     )
-    amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество',
-        validators=(validation_amount,),
-    )
+    amount = models.PositiveIntegerField(verbose_name='Количество')
+
+    class Meta:
+        unique_together = ('ingredient', 'recipe')
+        constraints = (
+            models.UniqueConstraint(
+                fields=('ingredient', 'recipe'),
+                name='recipe_ingredient_unique',
+            ),
+        )
 
     def __str__(self):
-        return f'{self.name} - {self.amount}'
+        return (
+            f'{self.ingredient} - {self.amount}'
+        )
+
 
 class FavoriteRecipe(models.Model):
     user = models.ForeignKey(
@@ -135,15 +137,11 @@ class FavoriteRecipe(models.Model):
         verbose_name='Рецепт',
     )
 
-    class Meta:
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'recipe',), name='unique_favorite'),)
-
     def __str__(self):
-        return f'{self.user} - {self.recipe}'
+        return (f'{self.user.username} favorited {self.recipe.name}')
 
-class ShoppingCart(models.Model):
+
+class Cart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -156,10 +154,6 @@ class ShoppingCart(models.Model):
         related_name='recipe_added_to_cart',
         verbose_name='Рецепт',
     )
-    class Meta:
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'recipe',), name='unique_shopping_cart')),
 
     def __str__(self):
-        return f'{self.user} - {self.recipe}'
+        return (f'{self.user.username} added {self.recipe.name} to cart')

@@ -1,16 +1,13 @@
-from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class AuthorOrGetOrReadOnly(permissions.BasePermission):
+class IsOwnerOrAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            return True
-        search_for_tags = [
-            'author', 'is_favorited', 'is_in_shopping_cart'
-        ] in request.query_params
-        return request.method == 'GET' and search_for_tags
+        if request.method == 'POST':
+            return request.user.is_authenticated
+        return True
 
     def has_object_permission(self, request, view, obj):
-        if request.method in ('PATCH', 'DELETE'):
-            return obj.author == request.user
-        return True
+        if request.method in SAFE_METHODS or request.user.is_superuser:
+            return True
+        return request.user == obj.author
