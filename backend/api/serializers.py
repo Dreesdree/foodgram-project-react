@@ -84,8 +84,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient in ingredients:
             if int(ingredient.get('amount')) <= COUNT_ING:
                 raise serializers.ValidationError(
-                    (f'Убедитесь, что значение количества '
-                     'ингредиента больше {COUNT_ING}')
+                    f'Убедитесь, что значение '
+                    f'количества ингредиента больше {COUNT_ING}'
                 )
             id = ingredient.get('id')
             if id in ingredients_set:
