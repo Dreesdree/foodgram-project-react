@@ -3,28 +3,27 @@ services:
 
   db:
     image: postgres:13.3-alpine
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env
 
-  frontend:
-    image: dreesdre/foodgram_frontend:latest
-    volumes:
-      - ../frontend/:/app/result_build/
-    depends_on:
-      - db
-
   backend:
-    image: dreesdre/foodgram_backend:latest
+    image: dreesdre/foodfram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
-      - frontend
+      - db
     env_file:
       - ./.env
+
+  frontend:
+    image: dreesdre/foodfram_frontend:latest
+    volumes:
+      - ../frontend/:/app/result_build/
 
   nginx:
     image: nginx:1.19.3
@@ -37,7 +36,8 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - backend
+      - foodfram_backend
+      - foodfram_frontend
 
 volumes:
   postgres_data:
