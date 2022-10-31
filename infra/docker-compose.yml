@@ -36,8 +36,8 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - foodfram_backend
-      - foodfram_frontend
+      - foodgram_backend
+      - foodgram_frontend
 
 volumes:
   postgres_data:
