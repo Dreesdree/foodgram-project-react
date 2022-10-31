@@ -10,7 +10,7 @@ services:
       - ./.env
 
   backend:
-    image: dreesdre/foodfram_backend:latest
+    image: dreesdre/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -21,7 +21,7 @@ services:
       - ./.env
 
   frontend:
-    image: dreesdre/foodfram_frontend:latest
+    image: dreesdre/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
