@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, **kwargs):
         with open(
-            FILE_TO_OPEN, "r", encoding="UTF-8"
+                FILE_TO_OPEN, "r", encoding="UTF-8"
         ) as file:
             reader = csv.reader(file, delimiter=",")
             for row in reader:
