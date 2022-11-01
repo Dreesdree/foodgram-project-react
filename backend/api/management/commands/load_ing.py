@@ -7,7 +7,7 @@ from recipes.models import Ingredient
 
 INGREDIENTS_CSV = 'ingredients.csv'
 INGREDIENTS_JSON = 'ingredients.json'
-DATA_PATH = os.path.join(BASE_DIR, '..', 'data')
+DATA_PATH = os.path.join(BASE_DIR, 'data')
 
 
 class Command(BaseCommand):
