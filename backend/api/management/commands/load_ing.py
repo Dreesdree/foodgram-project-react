@@ -1,26 +1,23 @@
-import csv
-from pathlib import Path
+import json
+import os
 
 from django.core.management.base import BaseCommand
-
+from foodgram.settings import BASE_DIR
 from recipes.models import Ingredient
 
-from foodgram.settings import BASE_DIR
-
-PROJECT_DIR = Path(BASE_DIR).resolve().parent.joinpath('data')
-FILE_TO_OPEN = PROJECT_DIR / "ingredients.csv"
+INGREDIENTS_CSV = 'ingredients.csv'
+INGREDIENTS_JSON = 'ingredients.json'
+DATA_PATH = os.path.join(BASE_DIR, 'data')
 
 
 class Command(BaseCommand):
-    help = "Импорт ингредиентов в БД"
+    help = 'Загрузка ингредиентов в БД из файла'
 
-    def handle(self, **kwargs):
-        with open(
-                FILE_TO_OPEN, "r", encoding="UTF-8"
-        ) as file:
-            reader = csv.reader(file, delimiter=",")
-            for row in reader:
-                Ingredient.objects.get_or_create(
-                    name=row['name'],
-                    measurement_unit=row['measurement_unit']
-                )
+    def handle(self, *args, **options):
+        path = os.path.join(DATA_PATH, INGREDIENTS_JSON)
+        Ingredient.objects.all().delete()
+
+        with open(path, 'r') as f:
+            Ingredient.objects.bulk_create(
+                objs=[Ingredient(**x) for x in json.load(f)]
+            )
