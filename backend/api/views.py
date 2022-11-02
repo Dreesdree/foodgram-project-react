@@ -80,6 +80,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
+    search_fields = ('^name',)
     permission_classes = (AllowAny,)
     filterset_class = IngredientNameFilter
 
