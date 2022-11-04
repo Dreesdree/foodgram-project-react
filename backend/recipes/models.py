@@ -10,7 +10,7 @@ from foodgram.settings import MIN_TIME
 def validate_cooking_time(value):
     if value < MIN_TIME:
         raise ValidationError(
-            'Время приготовления должно быть не меньше 1 минуты'
+            f'Время приготовления должно быть не меньше {MIN_TIME} минуты'
         )
     return value
 
@@ -51,6 +51,8 @@ class Recipe(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
+        verbose_name = ('Рецепт')
+        verbose_name_plural = ('Рецепты')
 
     def __str__(self):
         return self.name
@@ -76,6 +78,10 @@ class Tag(models.Model):
         )
     )
 
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
+
     def __str__(self):
         return self.name
 
@@ -89,6 +95,10 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name='Единица измерения',
     )
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return f'{self.name}'
@@ -109,6 +119,8 @@ class IngredientAmount(models.Model):
     amount = models.PositiveIntegerField(verbose_name='Количество')
 
     class Meta:
+        verbose_name = 'Колличество ингредиентов'
+        verbose_name_plural = 'Колличество ингредиентов'
         unique_together = ('ingredient', 'recipe')
         constraints = (
             models.UniqueConstraint(
@@ -137,6 +149,10 @@ class FavoriteRecipe(models.Model):
         verbose_name='Рецепт',
     )
 
+    class Meta:
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+
     def __str__(self):
         return (f'{self.user.username} favorited {self.recipe.name}')
 
@@ -154,6 +170,11 @@ class Cart(models.Model):
         related_name='recipe_added_to_cart',
         verbose_name='Рецепт',
     )
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
+
 
     def __str__(self):
         return (f'{self.user.username} added {self.recipe.name} to cart')

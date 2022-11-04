@@ -6,13 +6,11 @@ from django.db import models
 class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
-
     email = models.EmailField(
         'Адрес электронной почты',
         max_length=254,
         unique=True
     )
-
     username = models.CharField(
         'Уникальный никнейм',
         max_length=150,
@@ -23,12 +21,10 @@ class User(AbstractUser):
             ),
         )
     )
-
     first_name = models.CharField(
         'Имя',
         max_length=150
     )
-
     last_name = models.CharField(
         'Фамилия',
         max_length=150
@@ -53,6 +49,8 @@ class FollowAuthor(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Подписки на авторов'
+        verbose_name_plural = 'Подписки на авторов'
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'author',),
@@ -61,4 +59,4 @@ class FollowAuthor(models.Model):
         )
 
     def __str__(self):
-        return (f'{self.user.username} following {self.author.username}')
+        return (f'{self.user.username} подписан {self.author.username}')

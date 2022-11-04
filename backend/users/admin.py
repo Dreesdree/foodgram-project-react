@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
 from users.models import FollowAuthor, User
 
 
@@ -20,6 +19,9 @@ class AdminForUser(UserAdmin):
 
 class FollowAuthorAdmin(admin.ModelAdmin):
     list_display = ('author', 'user')
+    search_fields = ('user__username', 'author__username')
+
+
 
 
 admin.site.register(User, AdminForUser)

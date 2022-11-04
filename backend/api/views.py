@@ -1,13 +1,13 @@
 from django.db.models import Exists, OuterRef
 from django.http.response import HttpResponse
 from djoser.views import UserViewSet
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import IngredientNameFilter, RecipeFilter
+from api.filters import RecipeFilter
 from users.models import User, FollowAuthor
 from recipes.models import (Recipe, Tag, Ingredient, IngredientAmount,
                             FavoriteRecipe, Cart)
@@ -80,10 +80,9 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     pagination_class = None
-    search_fields = ('^name',)
     permission_classes = (AllowAny,)
-    filterset_class = IngredientNameFilter
-
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
@@ -170,10 +169,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True,
-            methods=['DELETE'],
-            permission_classes=[IsAuthenticated]
-            )
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk=None):
         user = request.user
