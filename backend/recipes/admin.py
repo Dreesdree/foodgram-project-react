@@ -10,11 +10,9 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ('^name',)
 
 
-
 class IngredientAmountAdmin(admin.TabularInline):
     model = IngredientAmount
     fk_name = 'recipe'
-
 
 
 class RecipeAdmin(admin.ModelAdmin):
@@ -26,7 +24,6 @@ class RecipeAdmin(admin.ModelAdmin):
     inlines = [
         IngredientAmountAdmin,
     ]
-
 
     def times_favorited(self, object):
         favorited = FavoriteRecipe.objects.filter(recipe=object).count()

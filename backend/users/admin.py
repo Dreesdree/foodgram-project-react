@@ -22,7 +22,5 @@ class FollowAuthorAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'author__username')
 
 
-
-
 admin.site.register(User, AdminForUser)
 admin.site.register(FollowAuthor, FollowAuthorAdmin)
